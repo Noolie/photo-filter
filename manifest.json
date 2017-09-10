@@ -1,0 +1,5 @@
+{
+  "short_name": "photo-filter",
+  "name": "react-photo-filter",
+  "start_url": "./index.html",
+}
