@@ -1,0 +1,25 @@
+* {
+  margin: 20px;
+}
+.app{
+  position: relative;
+}
+.controls{
+  display: flex;
+}
+.single-filter{
+  margin: 10px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.error-msg{
+  position: relative;
+  color: indianred;
+}
+
+.is-image {
+  display: none;
+}
