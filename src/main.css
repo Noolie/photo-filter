@@ -5,21 +5,30 @@
   position: relative;
 }
 .controls{
-  display: flex;
 }
 .single-filter{
-  margin: 10px;
+  float: left;
+  margin: 0px;
   width: 200px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
+.single-filter p {
+  text-transform: uppercase;
+  margin: 0;
+}
 .error-msg{
-  position: relative;
-  color: indianred;
+  margin: 0;
+  display: inline-block;
+  padding: 10px;
+  background: red;
+  position: fixed;
+  right: 0px;
+  transition: right .5s ease-out;
 }
 
 .is-image {
-  display: none;
+  right: -500px;
 }
