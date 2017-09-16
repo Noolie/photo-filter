@@ -29,6 +29,15 @@
   transition: right .5s ease-out;
 }
 
-.is-image {
+.is-notification {
   right: -500px;
+}
+.is-visible{
+  display: none;
+}
+.preview-height{
+  height: 400px;
+}
+.preview-width{
+  width: 200px;
 }

@@ -31,7 +31,7 @@ var filters = [
     key: 0.04,
     name: 'rgbOpacity',
     type: 'color-opacity',
-    initValue: 1,
+    initValue: 0.8,
     minValue: 0,
     maxValue: 1
   },
@@ -41,7 +41,7 @@ var filters = [
     type: 'percentage',
     initValue: 100,
     minValue: 0,
-    maxValue: 100
+    maxValue: 200
   },
   {
     key: 0.2,
@@ -49,7 +49,7 @@ var filters = [
     type: 'percentage',
     initValue: 100,
     minValue: 0,
-    maxValue: 100
+    maxValue: 200
   },
   {
     key: 0.3,
@@ -81,7 +81,7 @@ var filters = [
     type: 'percentage',
     initValue: 100,
     minValue: 0,
-    maxValue: 100
+    maxValue: 200
   },
   {
     key: 0.7,
@@ -93,19 +93,18 @@ var filters = [
   },
 ]
 
-class Add extends React.Component {
+class Filter extends React.Component {
   constructor(){
     super();
     this.state = {
       filters: filters,
-      isImage: true,
+      isNotification: true,
       error: '',
       currentImage: 'init-image.jpg',
       currentImageAlt: 'init image',
       renderedImage: 'init-image.jpg'
     }
   }
-
   fileSelect(ev){
     /*function to get an image from computer, save to memory and transfer into link*/
     let addedFile = ev.target.files[0];
@@ -116,14 +115,15 @@ class Add extends React.Component {
         if(!addedFile.type.match('image.*')){
           this.refs.addFile.value = '';
           this.setState({
-            isImage: false,
+            isNotification: false,
             error: 'files only with .png .jpg .jpeg endings allowed',
             currentImage: this.state.currentImage,
             currentImageAlt: this.state.currentImageAlt
           })
         } else {
           this.setState({
-            isImage: true,
+            filters: filters,
+            isNotification: true,
             currentImage: ev.target.result,
             currentImageAlt: currentFile.name,
             renderedImage: ev.target.result
@@ -186,19 +186,62 @@ class Add extends React.Component {
     }
   }
 
+  createLink(url){
+    let anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.target = '_blank';
+    anchor.download = this.state.currentImageAlt;
+    anchor.click();
+    console.log('5')
+  }
+
+  getResult(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+    let canvasFile = document.createElement('CANVAS');
+    canvasFile.width = this.refs.bigSizeImage.width;
+    canvasFile.height = this.refs.bigSizeImage.height;
+    console.log('1')
+    let ctx = canvasFile.getContext ? canvasFile.getContext('2d') : null;
+    let img = document.createElement('img');
+    img.src = this.state.currentImage;
+    console.log('2')
+    let filterHistory = [], colorHistory = [];
+    for(let i = 0; i < this.state.filters.length; i++){
+      if(this.state.filters[i].type != 'percentage') continue
+      filterHistory.push(this.state.filters[i].name + '(' + this.state.filters[i].initValue + '%)');
+    }
+    for(let i = 0; i < this.state.filters.length; i++){
+      if(this.state.filters[i].type != 'color') continue
+      colorHistory.push(this.state.filters[i].initValue)
+    }
+    console.log('3')
+    ctx.filter = [filterHistory.join('')];
+    ctx.fillStyle = 'rgba(' + colorHistory.join(',') + ',1)';
+    ctx.fillRect(0,0,canvasFile.width,canvasFile.height);
+    ctx.globalAlpha = this.refs.rgbOpacity.value;
+    console.log('4')
+    ctx.drawImage(img, 0, 0, canvasFile.width, canvasFile.height);
+    console.log('4.5')
+    this.createLink(canvasFile.toDataURL());
+    console.log(canvasFile.toDataURL())
+
+  }
+
   render(){
     return (
       <div className='filter'>
         <div className='error-block'>
-          <p className={'error-msg ' + (this.state.isImage?'is-image':'')}>{this.state.error}</p>
+          <p className={'error-msg ' + (this.state.isNotification?'is-notification':'')}>{this.state.error}</p>
         </div>
         <div className='add-file'>
           <input type='file' ref='addFile' onChange={this.fileSelect.bind(this)} />
           <p className='dwnld-notif'>Click on IMAGE to download current image</p>
         </div>
         <div className='current-image'>
-          <a href={this.state.renderedImage} download={'filtered-image-' + (Math.round(Math.random() * 1000))}>
-            <img ref='outputImage' src={this.state.renderedImage} alt={this.state.currentImageAlt}/>
+          <a ref='downloadImage' href={this.state.currentImage} onClick={this.getResult.bind(this)}>
+            <img ref='bigSizeImage' className='is-visible' src={this.state.currentImage} alt={this.state.currentImageAlt}/>
+            <img ref='outputImage' height='400' src={this.state.renderedImage} alt={this.state.currentImageAlt}/>
           </a>
         </div>
         <div className='controls'>
@@ -247,7 +290,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="app">
-        <Add />
+        <Filter />
       </div>
     );
   }
